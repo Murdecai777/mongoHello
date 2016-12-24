@@ -1,4 +1,7 @@
+import java.io.IOException;
 import java.util.Date;
+import java.util.List;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -7,49 +10,33 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         try {
-            MongoClient mongo = new MongoClient("localhost", 27017);
+            Connector connector = new Connector();
+            MongoClient client = connector.createClient("localhost", 27017);
+            DB db = connector.getDatabase(client, "LocalHost");
+            DBCollection table = connector.getCollection(db, "movies");
 
-            DB db = mongo.getDB("LocalHost");
-            DBCollection table = db.getCollection("user");
+            Searcher searcher = new Searcher(table);
+            String s = searcher.findObjects("The Godfather: Part II").get(0).toString();
+            System.out.println(s);
 
-            BasicDBObject document = new BasicDBObject();
-            document.put("name", "Hello");
-            document.put("created date", new Date());
-            table.insert(document);
+            Saver saver  = new Saver(table);
+            saver.setType("Horror");
+            saver.save("Zombie", "1979");
 
-            BasicDBObject searchQuery = new BasicDBObject();
-            searchQuery.put("name", "Hello");
 
-            DBCursor cursor = table.find(searchQuery);
+            BasicDBObject oldQ = new BasicDBObject();
+            oldQ.put("Type", "2013");
 
-            while (cursor.hasNext()) {
-                System.out.println(cursor.next());
-            }
+            BasicDBObject newQ = new BasicDBObject();
+            newQ.put("Type", "series");
+            saver.update(oldQ,newQ );
 
-            BasicDBObject query = new BasicDBObject();
-            query.put("name", "Hello");
-
-            BasicDBObject newDocument = new BasicDBObject();
-            newDocument.put("name", "World");
-
-            BasicDBObject updateObj = new BasicDBObject();
-            updateObj.put("$set", newDocument);
-
-            table.update(query, updateObj);
-
-            BasicDBObject searchQuery2
-                    = new BasicDBObject().append("name", "World");
-
-            DBCursor cursor2 = table.find(searchQuery2);
-
-            while (cursor2.hasNext()) {
-                System.out.println(cursor2.next());
-            }
-
-            System.out.println("Programm over!");
+            BasicDBObject del = new BasicDBObject();
+            del.put("Title", "12");
+            table.remove(del);
 
         } catch (MongoException e) {
             e.printStackTrace();
