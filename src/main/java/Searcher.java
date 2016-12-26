@@ -63,6 +63,45 @@ public class Searcher {
         return objects;
     }
 
+    List<BasicDBObject> filter(List<BasicDBObject> objects, String source, String target){
+        List<BasicDBObject> filteredObjects = new ArrayList<BasicDBObject>();
+
+
+       for(BasicDBObject object : objects){
+           String[] t = object.get(source).toString().split(",");
+
+           if(object.containsKey(source)){
+               if(object.get(source).equals((target))) {
+                   filteredObjects.add(object);
+               }else
+                   for (String aT : t)
+                       if (aT.equals((target))) {
+                           filteredObjects.add(object);
+                       }
+           }
+       }
+
+        return filteredObjects;
+    }
+
+    List<BasicDBObject> findByActor(String actors){
+        List<BasicDBObject> objects = new ArrayList<BasicDBObject>();
+        BasicDBObject searchQuery = new BasicDBObject();
+        searchQuery.put("Actors", actors);
+
+        DBCursor cursor = table.find(searchQuery);
+
+        if (!cursor.hasNext()) {
+            searchQuery.put("Actors", new BasicDBObject("$regex", actors));
+            cursor = table.find(searchQuery);
+        }
+
+        while (cursor.hasNext()) {
+            objects.add((BasicDBObject) cursor.next());
+        }
+        return objects;
+    }
+
     private void tryImport(String title, String year){
         Importer importer = new Importer();
         String parameters = importer.getParameters(title, year);

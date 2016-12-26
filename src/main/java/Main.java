@@ -38,6 +38,11 @@ public class Main {
             del.put("Title", "12");
             table.remove(del);
 
+            System.out.println(searcher.findByActor("Travis Fimmel"));
+
+
+            System.out.println( searcher.filter(searcher.findObjects("Godfat"), "Genre", "Crime"));
+
         } catch (MongoException e) {
             e.printStackTrace();
         }
