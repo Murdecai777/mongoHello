@@ -103,7 +103,7 @@ public class Importer {
     }
 
     String getURL(){
-        return "http://www.omdbapi.com";
+        return "https://www.omdbapi.com";
     }
 
     String getParameters(String title, String year){

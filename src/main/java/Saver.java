@@ -70,6 +70,8 @@ public class Saver {
                 update((BasicDBObject)cursor.next(), document);
             }
             return true;
+        }else {
+            table.insert(document);
         }
         return false;
     }
